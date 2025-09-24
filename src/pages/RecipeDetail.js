@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
-import { Clock, Users, Heart, MessageCircle, ChefHat, User, Flame, Leaf, Sun } from 'lucide-react';
+import { Clock, Users, Heart, MessageCircle, ChefHat, User, Flame, Leaf, Sun, Star } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const RecipeDetail = () => {
@@ -13,6 +13,7 @@ const RecipeDetail = () => {
   const [loading, setLoading] = useState(true);
   const [commentText, setCommentText] = useState('');
   const [isFavorited, setIsFavorited] = useState(false);
+  const [userRating, setUserRating] = useState(0);
 
   useEffect(() => {
     loadRecipe();
@@ -24,7 +25,14 @@ const RecipeDetail = () => {
       const response = await api.get(`/recipes/${id}`);
       setRecipe(response.data);
       
-      // Check if user has rated this recipe
+      if (isAuthenticated && response.data.ratings) {
+        const userRatingData = response.data.ratings.find(
+          rating => rating.user._id === user.id
+        );
+        if (userRatingData) {
+          setUserRating(userRatingData.rating);
+        }
+      }
     } catch (error) {
       toast.error('Failed to load recipe');
       navigate('/');
@@ -33,6 +41,22 @@ const RecipeDetail = () => {
     }
   };
 
+  const handleRating = async (rating) => {
+    if (!isAuthenticated) {
+      toast.error('Please login to rate recipes');
+      return;
+    }
+
+    try {
+      await api.post(`/recipes/${id}/rate`, { rating });
+      setUserRating(rating);
+      toast.success('Recipe rated successfully!');
+      loadRecipe(); // Reload to get updated rating
+    } catch (error) {
+      const message = error.response?.data?.message || 'Failed to rate recipe';
+      toast.error(message);
+    }
+  };
 
   const handleAddComment = async (e) => {
     e.preventDefault();
@@ -86,6 +110,21 @@ const RecipeDetail = () => {
     return mins > 0 ? `${hours} hours ${mins} minutes` : `${hours} hours`;
   };
 
+  const renderStars = (rating, interactive = false, onRatingChange = null) => {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      stars.push(
+        <Star
+          key={i}
+          size={20}
+          className={`star ${i <= rating ? 'filled' : ''} ${interactive ? 'cursor-pointer' : ''}`}
+          onClick={interactive && onRatingChange ? () => onRatingChange(i) : undefined}
+        />
+      );
+    }
+    return stars;
+  };
+
 
   if (loading) {
     return (
@@ -136,6 +175,19 @@ const RecipeDetail = () => {
         <p className="text-lg text-gray-600 mb-6">{recipe.description}</p>
 
         <div className="recipe-info">
+          <div className="info-item">
+            <Star size={20} className="mr-1 text-gray-500" />
+            <div>
+              <div className="font-semibold">Rating</div>
+              <div className="flex items-center gap-1">
+                <span className="text-sm">{recipe.averageRating || 0}</span>
+                <div className="star-rating">
+                  {renderStars(recipe.averageRating || 0)}
+                </div>
+                <span className="text-sm text-gray-500">({recipe.ratings?.length || 0})</span>
+              </div>
+            </div>
+          </div>
           <div className="info-item">
             <Clock size={20} className="mr-1 text-gray-500" />
             <div>
@@ -195,6 +247,18 @@ const RecipeDetail = () => {
           )}
           
         </div>
+
+        {isAuthenticated && (
+          <div className="card p-6 mb-6">
+            <h3 className="text-xl font-semibold mb-4">Rate this Recipe</h3>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600">Your rating:</span>
+              <div className="star-rating">
+                {renderStars(userRating, true, handleRating)}
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="flex items-center gap-4 mb-6">
           <div className="flex items-center gap-2">

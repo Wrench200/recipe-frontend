@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import api from '../services/api';
-import { Search as SearchIcon, Clock, Users, Filter, ChefHat } from 'lucide-react';
+import { Search as SearchIcon, Clock, Users, Filter, ChefHat, Star } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const SearchRecipe = () => {
@@ -93,6 +93,27 @@ const SearchRecipe = () => {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
+  };
+
+  const renderStars = (rating) => {
+    const stars = [];
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 !== 0;
+
+    for (let i = 0; i < fullStars; i++) {
+      stars.push(<Star key={i} size={16} className="star filled" />);
+    }
+
+    if (hasHalfStar) {
+      stars.push(<Star key="half" size={16} className="star filled" style={{ opacity: 0.5 }} />);
+    }
+
+    const emptyStars = 5 - Math.ceil(rating);
+    for (let i = 0; i < emptyStars; i++) {
+      stars.push(<Star key={`empty-${i}`} size={16} className="star" />);
+    }
+
+    return stars;
   };
 
 
@@ -342,6 +363,14 @@ const SearchRecipe = () => {
                     </div>
                   </div>
                   <p className="recipe-description">{recipe.description}</p>
+                  <div className="recipe-rating">
+                    <div className="star-rating">
+                      {renderStars(recipe.averageRating || 0)}
+                    </div>
+                    <span className="text-sm text-gray-500 ml-2">
+                      ({recipe.ratings?.length || 0} ratings)
+                    </span>
+                  </div>
                   <div className="flex items-center justify-between mt-2">
                     <span className="text-sm text-gray-500">{recipe.cuisine}</span>
                     <span className="text-sm text-gray-500">{recipe.diet}</span>
