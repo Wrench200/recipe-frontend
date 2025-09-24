@@ -4,7 +4,21 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-lerna-debug.log*
+
+# Production build
+build/
+dist/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs
+*.log
 
 # Runtime data
 pids
@@ -18,18 +32,6 @@ coverage/
 
 # nyc test coverage
 .nyc_output
-
-# Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
-.grunt
-
-# Bower dependency directory (https://bower.io/)
-bower_components
-
-# node-waf configuration
-.lock-wscript
-
-# Compiled binary addons (https://nodejs.org/api/addons.html)
-build/Release
 
 # Dependency directories
 jspm_packages/
@@ -61,14 +63,7 @@ jspm_packages/
 # Yarn Integrity file
 .yarn-integrity
 
-# dotenv environment variable files
-.env
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
-
-# parcel-bundler cache (https://parceljs.org/)
+# parcel-bundler cache
 .cache
 .parcel-cache
 
@@ -125,49 +120,9 @@ public
 ehthumbs.db
 Thumbs.db
 
-# Logs
-logs
-*.log
-
-# Database
-*.sqlite
-*.sqlite3
-*.db
-
-# Build outputs
-build/
-dist/
-out/
-
 # Temporary files
 tmp/
 temp/
-
-# Package manager lock files (uncomment if you want to ignore them)
-# package-lock.json
-# yarn.lock
-# pnpm-lock.yaml
-
-# React specific
-# Uncomment the following lines if you want to ignore build outputs
-# /frontend/build
-# /frontend/dist
-
-# Backend specific
-# Uncomment if you have any backend build outputs
-# /backend/build
-# /backend/dist
-
-# Environment files
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Local development
-.local
-local/
 
 # Backup files
 *.bak
